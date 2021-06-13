@@ -1,0 +1,100 @@
+﻿@model CustomerProductWebApplication.ViewModel.OrderViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            @Html.HiddenFor(m => m.Amount)
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @*<div class="form-group">
+            <label asp-for="CustomerId" class="control-label"></label>
+            <input asp-for="CustomerId" class="form-control" />
+            <span asp-validation-for="CustomerId" class="text-danger"></span>
+        </div>*@
+            <div class="form-group">
+                <label asp-for="CustomerName" class="control-label"></label>
+                <select asp-for="CustomerId" class="form-control"
+                        asp-items="@(new SelectList(Model.CustomerList,"Id","CustomerName"))">
+                    <option>Please select client</option>
+                </select>
+                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductId" class="control-label"></label>
+                <select asp-for="ProductId" class="form-control"
+                        asp-items="@(new SelectList(Model.ProductList,"Id","ProductType"))">
+                    <option>Please select product</option>
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input id="AmountProductedSelected" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OrderDate" class="control-label"></label>
+                <input asp-for="OrderDate" class="form-control" />
+                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script>
+
+    //$("#ProductId").on("change", function () {
+    //    var id = $("#ProductId").val();
+    //    debugger;
+    //    $.post("/Products/GetProductPrice/" + id,
+    //        {
+    //            data: id
+    //        });
+    //});
+
+    $("#ProductId").on("change", function () {
+        var id = $("#ProductId").val();
+
+        $.ajax({
+            dataType: "json",
+            type: "GET",
+            url: "/Products/GetProductPrice/" + id,
+            success: function (data) {
+                debugger;
+                $("#AmountProductedSelected").val(data.priceFormatBR);
+                $("#Amount").val(data.price);
+            }
+        });
+    });
+
+
+    $.validator.methods.range = function (value, element, param) {
+        var globalizedValue = value.replace(",", ".");
+        return this.optional(element) || (globalizedValue >= param[0] && globalizedValue <= param[1]);
+    }
+
+    $.validator.methods.number = function (value, element) {
+        return this.optional(element) || /-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/.test(value);
+    }
+ 
+
+</script>
+
+}
